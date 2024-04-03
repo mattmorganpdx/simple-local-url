@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Concatenate Input with Constant String</h2>
+
+<input type="text" id="userInput" value="">
+<button onclick="concatenate()">Concatenate</button>
+
+<script>
+const constantString = " - This is a constant string.";
+
+function concatenate() {
+  let userInput = document.getElementById("userInput").value;
+  let result = userInput + constantString;
+  alert(result);
+}
+</script>
+
+</body>
+</html>
