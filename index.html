@@ -1,33 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
+<style>
+    div {
+        padding: 10px;
+    }
+</style>
 <body>
 
-<h2>generate local launch link</h2>
-
-<input type="text" id="userInput" value="">
-<input type="text" id="targetUrl" placeholder="Enter target URL">
-<button onclick="concatenate()">Generate Link</button>
+<h2>Generate Launch Link</h2>
+<div>
+    <input type="text" id="userInput" value="" placeholder="Token">
+</div>
+<div>
+    <input type="text" id="targetUrl" value="http://localhost:5173" placeholder="Enter target URL">
+</div>
+<div>
+    <button onclick="concatenate()">Generate Link</button>
+</div>
 <div id="result"></div>
-<a id="launchLink" href="#">Launch</a>
+<div>
+    <button id="launchLink" onclick="window.location.href=this.value" value="#" disabled="disabled">Launch</button>
+</div>
 
 <script>
-    const constantString = "http://localhost:5173/?web_host=";
 
     function concatenate() {
-    let userInput = document.getElementById("userInput").value;
-    let targetUrl = document.getElementById("targetUrl").value;
-    let urlParams = new URLSearchParams(window.location.search);
-    let webHost = urlParams.get('web_host');
-    let baseUrl
-    if (targetUrl) {
-        baseUrl = `${targetUrl}/?web_host=`
-    } else {
-        baseUrl = constantString;
+        let userInput = document.getElementById("userInput").value;
+        let targetUrl = document.getElementById("targetUrl").value;
+        let urlParams = new URLSearchParams(window.location.search);
+        let webHost = urlParams.get('web_host');
+        let result = `${targetUrl}/?web_host=${webHost}&token=${userInput}`;
+        document.getElementById("result").innerText = result;
+        document.getElementById("launchLink").value = result;
+
+        document.getElementById("launchLink").disabled = false;
     }
-    let result = `${baseUrl}${webHost}&token=${userInput}`;
-    document.getElementById("result").innerText = result;
-    document.getElementById("launchLink").href = result;
-}
 </script>
 
 </body>
