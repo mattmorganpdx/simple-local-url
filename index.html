@@ -5,6 +5,7 @@
 <h2>generate local launch link</h2>
 
 <input type="text" id="userInput" value="">
+<input type="text" id="targetUrl" placeholder="Enter target URL">
 <button onclick="concatenate()">Generate Link</button>
 <div id="result"></div>
 <a id="launchLink" href="#">Launch</a>
@@ -13,18 +14,20 @@
     const constantString = "http://localhost:5173/?web_host=";
 
     function concatenate() {
-        let userInput = document.getElementById("userInput").value;
-        let urlParams = new URLSearchParams(window.location.search);
-        let webHost = urlParams.get('web_host');
-        let result = `${constantString}${webHost}&token=${userInput}`;
-        document.getElementById("result").innerText = result;
-        document.getElementById("launchLink").href = result;
+    let userInput = document.getElementById("userInput").value;
+    let targetUrl = document.getElementById("targetUrl").value;
+    let urlParams = new URLSearchParams(window.location.search);
+    let webHost = urlParams.get('web_host');
+    let baseUrl
+    if (targetUrl) {
+        baseUrl = `${targetUrl}/?web_host=`
+    } else {
+        baseUrl = constantString;
     }
-
-    function copyToClipboard() {
-        let result = document.getElementById("result").innerText;
-        navigator.clipboard.writeText(result);
-    }
+    let result = `${baseUrl}${webHost}&token=${userInput}`;
+    document.getElementById("result").innerText = result;
+    document.getElementById("launchLink").href = result;
+}
 </script>
 
 </body>
