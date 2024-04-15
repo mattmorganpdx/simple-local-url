@@ -1,26 +1,38 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
 <style>
     div {
         padding: 10px;
+    }
+
+    #decodedToken {
+        border: 1px solid black;
+        padding: 10px;
+        max-width: 80ch;
+        white-space: pre;
     }
 </style>
 <body>
 
 <h2>Generate Launch Link</h2>
 <div>
-    <input type="text" id="userInput" value="" placeholder="Token">
+    <label for="userInput"></label><input type="text" id="userInput" value="" placeholder="Token"
+                                          oninput="concatenate()">
 </div>
 <div>
-    <input type="text" id="targetUrl" value="http://localhost:5173" placeholder="Enter target URL">
+    <label for="targetUrl"></label><input type="text" id="targetUrl" value="http://localhost:5173"
+                                          placeholder="Enter target URL"
+                                          oninput="concatenate()">
 </div>
 <div>
-    <button onclick="concatenate()">Generate Link</button>
+    <label for="webHost"></label><input type="text" id="webHost" value="" placeholder="Web Host"
+                                        oninput="concatenate()">
 </div>
 <div id="result"></div>
 <div>
     <button id="launchLink" onclick="window.location.href=this.value" value="#" disabled="disabled">Launch</button>
 </div>
+<div id="decodedToken"></div>
 
 <script>
 
@@ -28,13 +40,43 @@
         let userInput = document.getElementById("userInput").value;
         let targetUrl = document.getElementById("targetUrl").value;
         let urlParams = new URLSearchParams(window.location.search);
-        let webHost = urlParams.get('web_host');
+        let webHost = document.getElementById("webHost").value || urlParams.get('web_host');
         let result = `${targetUrl}/?web_host=${webHost}&token=${userInput}`;
         document.getElementById("result").innerText = result;
         document.getElementById("launchLink").value = result;
 
-        document.getElementById("launchLink").disabled = false;
+        // Populate webHost div
+        document.getElementById("webHost").value = webHost;
+
+        // Decode JWT token
+        try {
+            let base64Url = userInput.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            let jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+
+            let decodedToken = JSON.parse(jsonPayload);
+            document.getElementById("decodedToken").innerText = JSON.stringify(decodedToken, null, 2);
+
+            // Calculate token validity
+            let exp = decodedToken.exp;
+            let now = Math.floor(Date.now() / 1000);
+            let diffInSeconds = exp - now;
+            let diffInHours = Math.floor(diffInSeconds / 3600);
+            let diffInMinutes = Math.floor((diffInSeconds % 3600) / 60);
+
+            document.getElementById("decodedToken").innerText += `\nToken is valid for ${diffInHours} hours and ${diffInMinutes} minutes.`;
+            document.getElementById("launchLink").disabled = false;
+        } catch (e) {
+            document.getElementById("decodedToken").innerText = "Invalid Token";
+            document.getElementById("launchLink").disabled = true;
+        }
     }
+
+    // Call concatenate function on page load to initialize result
+    window.onload = concatenate;
 </script>
 
 </body>
